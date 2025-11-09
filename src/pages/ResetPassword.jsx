@@ -7,6 +7,8 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { useRegisteredUsers } from '../stores/useRegisteredUsers';
+import bcrypt from 'bcryptjs';
+import axios from 'axios';
 
 const validationSchema = yup.object({
   password: yup
@@ -27,7 +29,18 @@ export const ResetPassword = () => {
   });
   const { handleSubmit } = methods;
 
-  const onSubmit = data => {
+  const onSubmit = async data => {
+    console.log(data);
+    const hashed = await bcrypt.hash(data.password, 10);
+    axios(`https://192.168.15.40:5278/api/Users/${email}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {
+        password: hashed,
+      },
+    });
     const emailExists = registeredUsers.some(user => user.email === email);
 
     if (!emailExists) {

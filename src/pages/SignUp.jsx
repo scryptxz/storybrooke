@@ -55,7 +55,7 @@ export const SignUp = () => {
           data: { ...data, password: await bcrypt.hash(data.password, 10) },
         }).then(res => console.log(res));
 
-        const newUser = { ...data, id: uuidv4() };
+        const newUser = { ...data, userId: uuidv4() };
 
         setNewUser(newUser);
         setUser(newUser);
