@@ -12,7 +12,7 @@ export const useWishList = create()(
         const userId = useUser.getState().user?.userId;
         if (!userId) return;
 
-        await axios('http://192.168.15.40:5278/api/WishList', {
+        await axios('https://192.168.15.40:5278/api/WishList', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const useWishList = create()(
         const userId = useUser.getState().user?.userId;
         if (!userId) return;
         console.log(bookId);
-        await axios(`http://192.168.15.40:5278/api/WishList/${bookId}`, {
+        await axios(`https://192.168.15.40:5278/api/WishList/${bookId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export const useWishList = create()(
       getWishList: async () => {
         const userId = useUser.getState().user?.userId;
         if (!userId) return [];
-        await axios(`http://192.168.15.40:5278/api/WishList/ByUser/${userId}`, {
+        await axios(`https://192.168.15.40:5278/api/WishList/ByUser/${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
