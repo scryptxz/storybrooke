@@ -9,9 +9,11 @@ import { Input } from '../components/Input';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { useRegisteredUsers } from '../stores/useRegisteredUsers';
 import { useUser } from '../stores/useUser';
+import bcrypt from 'bcryptjs';
+import axios from 'axios';
 
 const validationSchema = yup.object({
-  name: yup.string().required('Campo obrigatório'),
+  username: yup.string().required('Campo obrigatório'),
   email: yup.string().email('E-mail inválido').required('Campo obrigatório'),
   password: yup
     .string()
@@ -20,7 +22,7 @@ const validationSchema = yup.object({
 });
 
 export const SignUp = () => {
-  const { registeredUsers, setNewUser } = useRegisteredUsers();
+  const { setNewUser } = useRegisteredUsers();
   const { setUser } = useUser();
   const navigate = useNavigate();
 
@@ -29,22 +31,36 @@ export const SignUp = () => {
   });
   const { handleSubmit } = methods;
 
-  const onSubmit = data => {
-    const emailExists = registeredUsers.some(user => user.email === data.email);
+  const onSubmit = async data => {
+    axios('http://192.168.15.40:5278/api/Users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    })
+      .then(res => {
+        const emailExists = res.data.some(user => user.email === data.email);
+        if (emailExists) {
+          toast.error('E-mail já cadastrado');
+          throw new Error("E-mail já cadastrado");
+        }
+      })
+      .then(async () => {
+        axios('http://192.168.15.40:5278/api/Users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: { ...data, password: await bcrypt.hash(data.password, 10) },
+        }).then(res => console.log(res));
 
-    if (emailExists) {
-      toast.error('E-mail já cadastrado');
+        const newUser = { ...data, id: uuidv4() };
 
-      return;
-    }
-
-    console.log(data);
-
-    const newUser = { ...data, id: uuidv4() };
-
-    setNewUser(newUser);
-    setUser(newUser);
-    navigate('/');
+        setNewUser(newUser);
+        setUser(newUser);
+        navigate('/');
+      });
   };
 
   return (
@@ -53,7 +69,7 @@ export const SignUp = () => {
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-          <Input name="name" placeholder="Nome" />
+          <Input name="username" placeholder="Nome" />
 
           <Input name="email" type="email" placeholder="E-mail" />
 

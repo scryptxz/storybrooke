@@ -1,44 +1,64 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useUser } from './useUser';
+import axios from 'axios';
 
 export const useWishList = create()(
   persist(
     (set, get) => ({
       wishLists: {},
 
-      addToWishList: book => {
-        const userId = useUser.getState().user?.id;
+      addToWishList: async book => {
+        const userId = useUser.getState().user?.userId;
         if (!userId) return;
 
-        const current = get().wishLists[userId] || [];
+        await axios('http://192.168.15.40:5278/api/WishList', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: {
+            userId: userId,
+            bookId: book.id,
+          },
+        }).then(res => {
+          console.log(res);
+          const current = get().wishLists[userId] || [];
+          if (!current.find(b => b.id === book.id)) {
+            set(state => ({
+              wishLists: {
+                ...state.wishLists,
+                [userId]: [...current, book],
+              },
+            }));
+          }
+        });
+      },
 
-        if (!current.find(b => b.id === book.id)) {
+      removeFromWishList: async bookId => {
+        const userId = useUser.getState().user?.userId;
+        if (!userId) return;
+        console.log(bookId);
+        await axios(`http://192.168.15.40:5278/api/WishList/${bookId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }).then(res => {
+          console.log(res);
+          const current = get().wishLists[userId] || [];
+
           set(state => ({
             wishLists: {
               ...state.wishLists,
-              [userId]: [...current, book],
+              [userId]: current.filter(b => b.id !== bookId),
             },
           }));
-        }
-      },
-
-      removeFromWishList: bookId => {
-        const userId = useUser.getState().user?.id;
-        if (!userId) return;
-
-        const current = get().wishLists[userId] || [];
-
-        set(state => ({
-          wishLists: {
-            ...state.wishLists,
-            [userId]: current.filter(b => b.id !== bookId),
-          },
-        }));
+        });
       },
 
       isInWishList: bookId => {
-        const userId = useUser.getState().user?.id;
+        const userId = useUser.getState().user?.userId;
         if (!userId) return false;
 
         const list = get().wishLists[userId] || [];
@@ -46,10 +66,15 @@ export const useWishList = create()(
         return list.some(book => book.id === bookId);
       },
 
-      getWishList: () => {
-        const userId = useUser.getState().user?.id;
+      getWishList: async () => {
+        const userId = useUser.getState().user?.userId;
         if (!userId) return [];
-
+        await axios(`http://192.168.15.40:5278/api/WishList/ByUser/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
         return get().wishLists[userId] || [];
       },
     }),

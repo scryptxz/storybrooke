@@ -6,8 +6,9 @@ import * as yup from 'yup';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { AuthLayout } from '../layouts/AuthLayout';
-import { useRegisteredUsers } from '../stores/useRegisteredUsers';
+import bcrypt from 'bcryptjs';
 import { useUser } from '../stores/useUser';
+import axios from 'axios';
 
 const validationSchema = yup.object({
   email: yup.string().email('E-mail inválido').required('Campo obrigatório'),
@@ -15,7 +16,6 @@ const validationSchema = yup.object({
 });
 
 export const SignIn = () => {
-  const { registeredUsers } = useRegisteredUsers();
   const { setUser } = useUser();
   const navigate = useNavigate();
 
@@ -25,19 +25,36 @@ export const SignIn = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = data => {
-    const foundUser = registeredUsers.find(
-      user => user.email === data.email && user.password === data.password,
-    );
-
-    if (foundUser) {
-      setUser(foundUser);
-
-      return navigate('/');
-    }
-
-    if (!foundUser) {
-      return toast.error('E-mail e/ou senha inválidos.');
-    }
+    axios('http://192.168.15.40:5278/api/Users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    })
+      .then(async res => {
+        console.log(res);
+        const userSearch = res.data.find(user => user.email === data.email);
+        if (!userSearch) {
+          return toast.error('E-mail e/ou senha inválidos.');
+        }
+        const foundUser = await bcrypt.compare(
+          data.password,
+          userSearch.password,
+        );
+        console.log(foundUser);
+        if (foundUser) {
+          setUser(userSearch);
+          return navigate('/');
+        }
+        if (!foundUser) {
+          return toast.error('E-mail e/ou senha inválidos.');
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error('Erro no servidor.');
+      });
   };
 
   return (
