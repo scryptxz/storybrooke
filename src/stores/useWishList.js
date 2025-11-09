@@ -35,17 +35,17 @@ export const useWishList = create()(
         });
       },
 
-      removeFromWishList: async bookId => {
+      removeFromWishList: async (bookId) => {
         const userId = useUser.getState().user?.userId;
         if (!userId) return;
         console.log(bookId);
-        await axios(`https://192.168.15.40:5278/api/WishList/${bookId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
+        await axios(
+          `https://192.168.15.40:5278/api/WishList/${userId}/${bookId}`,
+          {
+            method: 'DELETE',
           },
-        }).then(res => {
-          console.log(res);
+        ).then(res => {
+          console.log('DELETAR', res);
           const current = get().wishLists[userId] || [];
 
           set(state => ({
@@ -69,12 +69,15 @@ export const useWishList = create()(
       getWishList: async () => {
         const userId = useUser.getState().user?.userId;
         if (!userId) return [];
-        await axios(`https://192.168.15.40:5278/api/WishList/ByUser/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
+        await axios(
+          `https://192.168.15.40:5278/api/WishList/ByUser/${userId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        })
+        );
         return get().wishLists[userId] || [];
       },
     }),

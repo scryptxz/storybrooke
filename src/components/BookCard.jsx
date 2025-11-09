@@ -1,19 +1,20 @@
 import dayjs from 'dayjs';
 import { LuBookmarkCheck, LuBookmarkPlus } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../stores/useUser';
+//import { useUser } from '../stores/useUser';
 import { useWishList } from '../stores/useWishList';
 import { Button } from './Button';
 import { IconButton } from './IconButton';
 
 export const BookCard = ({ book }) => {
-  const { user } = useUser();
+  //const { user } = useUser();
   const { addToWishList, removeFromWishList, isInWishList } = useWishList();
   const navigate = useNavigate();
 
   const handleToggleWishlist = () => {
+    console.log(book.id)
     if (isInWishList(book.id)) {
-      removeFromWishList(user.id, book.id);
+      removeFromWishList(book.id);
       return;
     }
 
