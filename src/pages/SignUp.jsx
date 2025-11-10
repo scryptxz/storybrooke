@@ -32,7 +32,7 @@ export const SignUp = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = async data => {
-    axios('https://192.168.15.40:5278/api/Users', {
+    axios('https://localhost:5278/api/Users', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export const SignUp = () => {
         }
       })
       .then(async () => {
-        axios('https://192.168.15.40:5278/api/Users', {
+        axios('https://localhost:5278/api/Users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

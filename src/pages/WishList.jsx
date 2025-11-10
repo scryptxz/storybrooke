@@ -14,7 +14,7 @@ export const WishList = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios(`https://192.168.15.40:5278/api/WishList/ByUser/${userId}`, {
+    axios(`https://localhost:5278/api/WishList/ByUser/${userId}`, {
       method: 'GET',
     })
       .then(async res => {

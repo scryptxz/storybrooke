@@ -25,7 +25,7 @@ export const SignIn = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = data => {
-    axios('https://192.168.15.40:5278/api/Users', {
+    axios('https://localhost:5278/api/Users', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

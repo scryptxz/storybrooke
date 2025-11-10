@@ -12,7 +12,7 @@ export const useWishList = create()(
         const userId = useUser.getState().user?.userId;
         if (!userId) return;
 
-        await axios('https://192.168.15.40:5278/api/WishList', {
+        await axios('https://localhost:5278/api/WishList', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ export const useWishList = create()(
         if (!userId) return;
         console.log(bookId);
         await axios(
-          `https://192.168.15.40:5278/api/WishList/${userId}/${bookId}`,
+          `https://localhost:5278/api/WishList/${userId}/${bookId}`,
           {
             method: 'DELETE',
           },
@@ -70,7 +70,7 @@ export const useWishList = create()(
         const userId = useUser.getState().user?.userId;
         if (!userId) return [];
         await axios(
-          `https://192.168.15.40:5278/api/WishList/ByUser/${userId}`,
+          `https://localhost:5278/api/WishList/ByUser/${userId}`,
           {
             method: 'GET',
             headers: {

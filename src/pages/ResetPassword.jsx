@@ -32,7 +32,7 @@ export const ResetPassword = () => {
   const onSubmit = async data => {
     console.log(data);
     const hashed = await bcrypt.hash(data.password, 10);
-    axios(`https://192.168.15.40:5278/api/Users/${email}`, {
+    axios(`https://localhost:5278/api/Users/${email}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
