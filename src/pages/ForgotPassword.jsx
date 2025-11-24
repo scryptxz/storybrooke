@@ -6,14 +6,13 @@ import * as yup from 'yup';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { AuthLayout } from '../layouts/AuthLayout';
-import { useRegisteredUsers } from '../stores/useRegisteredUsers';
+import axios from 'axios';
 
 const validationSchema = yup.object({
   email: yup.string().email('E-mail inválido').required('Campo obrigatório'),
 });
 
 export const ForgotPassword = () => {
-  const { registeredUsers } = useRegisteredUsers();
   const navigate = useNavigate();
 
   const methods = useForm({
@@ -21,16 +20,22 @@ export const ForgotPassword = () => {
   });
   const { handleSubmit } = methods;
 
-  const onSubmit = data => {
-    const foundUser = registeredUsers.find(user => user.email === data.email);
-
-    if (foundUser) {
-      return navigate(`/reset-password?email=${data.email}`);
-    }
-
-    if (!foundUser) {
-      return toast.error('Usuário não encontrado.');
-    }
+  const onSubmit = async data => {
+    await axios('https://localhost:5278/api/Users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    }).then(res => {
+      const foundUser = res.data.find(a => a.email === data.email);
+      if (foundUser) {
+        console.log('ACHOU');
+        return navigate(`/reset-password?email=${data.email}`);
+      } else {
+        return toast.error('Usuário não encontrado.');
+      }
+    });
   };
 
   return (
