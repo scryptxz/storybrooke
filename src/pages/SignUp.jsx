@@ -8,7 +8,6 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { useRegisteredUsers } from '../stores/useRegisteredUsers';
-import { useUser } from '../stores/useUser';
 import bcrypt from 'bcryptjs';
 import axios from 'axios';
 
@@ -23,7 +22,6 @@ const validationSchema = yup.object({
 
 export const SignUp = () => {
   const { setNewUser } = useRegisteredUsers();
-  const { setUser } = useUser();
   const navigate = useNavigate();
 
   const methods = useForm({
@@ -58,8 +56,7 @@ export const SignUp = () => {
         const newUser = { ...data, userId: uuidv4() };
 
         setNewUser(newUser);
-        setUser(newUser);
-        navigate('/');
+        navigate('/login');
       });
   };
 
